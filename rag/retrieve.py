@@ -53,10 +53,20 @@ class RAGService:
             D, I = self.index.search(q, limit)
             results = []
             for d, i in zip(D[0], I[0]):
+                # FAISS returns distances (lower is better), convert to similarity score (0-1)
+                # For L2 distance: similarity = 1 / (1 + distance)
+                # For negative distances (inner product), convert to positive similarity
+                if d < 0:
+                    # Negative distance means good match in inner product space
+                    similarity = min(abs(d), 1.0)
+                else:
+                    # Positive distance: convert to similarity score
+                    similarity = 1.0 / (1.0 + float(d))
+                
                 results.append({
                     "title": f"chunk-{int(i)}",
                     "content": self.chunks[int(i)],
-                    "relevance": float(d),
+                    "relevance": similarity,
                 })
             return results
 
