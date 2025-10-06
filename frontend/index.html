@@ -402,6 +402,285 @@
             background: #38a169;
             transform: scale(1.05);
         }
+
+        /* Enhanced Prediction UI Styles */
+        .prediction-dashboard {
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .prediction-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .prediction-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .model-info {
+            font-size: 0.85rem;
+            color: #718096;
+        }
+
+        .status-banner {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-normal {
+            background: #c6f6d5;
+            color: #22543d;
+            border-left: 5px solid #48bb78;
+        }
+
+        .status-warning {
+            background: #fefcbf;
+            color: #744210;
+            border-left: 5px solid #ed8936;
+        }
+
+        .status-alert {
+            background: #fed7d7;
+            color: #742a2a;
+            border-left: 5px solid #f56565;
+        }
+
+        .horizon-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .horizon-tab {
+            flex: 1;
+            padding: 12px;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .horizon-tab:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .horizon-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+
+        .horizon-content {
+            display: none;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .horizon-content.active {
+            display: block;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .metric-card {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .metric-label {
+            font-size: 0.85rem;
+            color: #718096;
+            margin-bottom: 5px;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .risk-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .risk-low {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .risk-medium {
+            background: #fefcbf;
+            color: #744210;
+        }
+
+        .risk-high {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .factors-container {
+            margin-top: 20px;
+        }
+
+        .factors-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 15px;
+        }
+
+        .factor-bar {
+            margin-bottom: 12px;
+        }
+
+        .factor-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+
+        .factor-progress {
+            height: 25px;
+            background: #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .factor-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+            color: white;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .confidence-meter {
+            margin-top: 15px;
+        }
+
+        .confidence-bar {
+            height: 20px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+
+        .confidence-high {
+            background: linear-gradient(90deg, #48bb78 0%, #38a169 100%);
+        }
+
+        .confidence-medium {
+            background: linear-gradient(90deg, #ed8936 0%, #dd6b20 100%);
+        }
+
+        .confidence-low {
+            background: linear-gradient(90deg, #f56565 0%, #e53e3e 100%);
+        }
+
+        .technical-details {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .technical-toggle {
+            cursor: pointer;
+            color: #667eea;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .technical-toggle:hover {
+            text-decoration: underline;
+        }
+
+        .technical-content {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .technical-content.show {
+            display: block;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .export-btn {
+            padding: 8px 16px;
+            background: #4299e1;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .export-btn:hover {
+            background: #3182ce;
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
@@ -707,7 +986,7 @@
             
             showLoading('predictLoading', true);
             showStatus('predictStatus', '', '');
-            showResult('predictResult', '');
+            document.getElementById('predictResult').innerHTML = '';
 
             try {
                 const response = await fetch(`${API_BASE}/predict?api_key=${API_KEY}`, {
@@ -717,19 +996,17 @@
                     },
                     body: JSON.stringify({
                         machine_id: machineId,
-                        horizon_hours: parseInt(horizonHours)
+                        horizon_hours: parseInt(horizonHours),
+                        include_anomaly: true,
+                        include_factors: true
                     })
                 });
 
                 const data = await response.json();
                 
                 if (response.ok) {
-                    const probability = (data.failure_probability * 100).toFixed(2);
-                    const riskLevel = data.failure_probability > 0.7 ? '🔴 HIGH' : 
-                                    data.failure_probability > 0.4 ? '🟡 MEDIUM' : '🟢 LOW';
-                    
-                    showStatus('predictStatus', `✅ Prediction completed - Risk Level: ${riskLevel}`, 'success');
-                    showResult('predictResult', JSON.stringify(data, null, 2));
+                    showStatus('predictStatus', '✅ Prediction analysis complete!', 'success');
+                    renderPredictionDashboard(data, machineId);
                 } else {
                     showStatus('predictStatus', `❌ Prediction failed: ${data.detail || 'Unknown error'}`, 'error');
                 }
@@ -738,6 +1015,248 @@
             } finally {
                 showLoading('predictLoading', false);
             }
+        }
+
+        // Render prediction dashboard
+        function renderPredictionDashboard(data, machineId) {
+            const container = document.getElementById('predictResult');
+            const predictions = data.predictions || [data];
+            
+            // Determine overall status
+            const maxFailureProb = Math.max(...predictions.map(p => p.failure_probability || 0));
+            const maxAnomalyScore = Math.max(...predictions.map(p => p.anomaly_score || 0));
+            
+            let statusClass = 'status-normal';
+            let statusIcon = '🟢';
+            let statusText = 'NORMAL - No issues detected';
+            
+            if (maxFailureProb > 0.7 || maxAnomalyScore > 0.8) {
+                statusClass = 'status-alert';
+                statusIcon = '🔴';
+                statusText = 'ALERT - High risk detected';
+            } else if (maxFailureProb > 0.3 || maxAnomalyScore > 0.5) {
+                statusClass = 'status-warning';
+                statusIcon = '🟡';
+                statusText = 'WARNING - Moderate risk detected';
+            }
+            
+            let html = `
+                <div class="prediction-dashboard">
+                    <div class="prediction-header">
+                        <div class="prediction-title">Prediction Dashboard: ${machineId}</div>
+                        <div class="model-info">
+                            Model: ${data.model_version || 'v1.0.0'} | 
+                            Generated: ${new Date().toLocaleString()}
+                        </div>
+                    </div>
+                    
+                    <div class="status-banner ${statusClass}">
+                        <span style="font-size: 1.5rem;">${statusIcon}</span>
+                        <span>${statusText}</span>
+                    </div>
+            `;
+            
+            // Add horizon tabs if multiple predictions
+            if (predictions.length > 1) {
+                html += `<div class="horizon-tabs">`;
+                predictions.forEach((pred, idx) => {
+                    const horizon = pred.horizon_hours || 24;
+                    html += `
+                        <div class="horizon-tab ${idx === 0 ? 'active' : ''}" onclick="switchHorizon(${idx})">
+                            ${horizon}h Forecast
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+            }
+            
+            // Add horizon content
+            predictions.forEach((pred, idx) => {
+                html += renderHorizonContent(pred, idx, idx === 0);
+            });
+            
+            // Add export buttons
+            html += `
+                <div class="export-buttons">
+                    <button class="export-btn" onclick="exportPrediction('json')">
+                        📄 Download JSON
+                    </button>
+                    <button class="export-btn" onclick="exportPrediction('csv')">
+                        📊 Download CSV
+                    </button>
+                </div>
+            `;
+            
+            html += `</div>`;
+            container.innerHTML = html;
+            
+            // Store data for export
+            window.predictionData = data;
+        }
+
+        // Render individual horizon content
+        function renderHorizonContent(pred, index, isActive) {
+            const failureProb = (pred.failure_probability || 0) * 100;
+            const anomalyScore = (pred.anomaly_score || 0) * 100;
+            const confidence = (pred.confidence || 0) * 100;
+            
+            // Determine risk levels
+            let riskClass = 'risk-low';
+            let riskText = 'Very Low Risk';
+            let riskIcon = '🟢';
+            
+            if (failureProb > 70) {
+                riskClass = 'risk-high';
+                riskText = 'High Risk';
+                riskIcon = '🔴';
+            } else if (failureProb > 30) {
+                riskClass = 'risk-medium';
+                riskText = 'Medium Risk';
+                riskIcon = '🟡';
+            }
+            
+            let anomalyClass = 'risk-low';
+            let anomalyText = 'Normal';
+            
+            if (anomalyScore > 80) {
+                anomalyClass = 'risk-high';
+                anomalyText = 'High Anomaly';
+            } else if (anomalyScore > 50) {
+                anomalyClass = 'risk-medium';
+                anomalyText = 'Moderate Anomaly';
+            }
+            
+            let confClass = confidence > 70 ? 'confidence-high' : confidence > 50 ? 'confidence-medium' : 'confidence-low';
+            let confLabel = confidence > 70 ? 'High' : confidence > 50 ? 'Medium' : 'Low';
+            
+            let html = `
+                <div class="horizon-content ${isActive ? 'active' : ''}" id="horizon-${index}">
+                    <div class="metric-grid">
+                        <div class="metric-card">
+                            <div class="metric-label">Failure Probability</div>
+                            <div class="metric-value">
+                                ${failureProb < 0.01 ? '<0.01' : failureProb.toFixed(2)}%
+                            </div>
+                            <span class="risk-badge ${riskClass}">${riskIcon} ${riskText}</span>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <div class="metric-label">Anomaly Score</div>
+                            <div class="metric-value">${anomalyScore.toFixed(1)}%</div>
+                            <span class="risk-badge ${anomalyClass}">${anomalyText}</span>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <div class="metric-label">Confidence Level</div>
+                            <div class="metric-value">${confidence.toFixed(0)}%</div>
+                            <div class="confidence-meter">
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill ${confClass}" style="width: ${confidence}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            `;
+            
+            // Add top factors if available
+            if (pred.top_factors && pred.top_factors.length > 0) {
+                html += `
+                    <div class="factors-container">
+                        <div class="factors-title">📊 Top Contributing Factors</div>
+                `;
+                
+                pred.top_factors.slice(0, 5).forEach(factor => {
+                    const featureName = factor.feature.replace(/_/g, ' ').replace(/roll/g, 'avg');
+                    const importance = factor.importance * 100;
+                    
+                    html += `
+                        <div class="factor-bar">
+                            <div class="factor-label">
+                                <span>${featureName}</span>
+                                <span>${importance.toFixed(1)}%</span>
+                            </div>
+                            <div class="factor-progress">
+                                <div class="factor-fill" style="width: ${importance}%">
+                                    ${importance.toFixed(0)}%
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `</div>`;
+            }
+            
+            // Add technical details
+            html += `
+                <div class="technical-details">
+                    <div class="technical-toggle" onclick="toggleTechnical(${index})">
+                        ▼ Technical Details
+                    </div>
+                    <div class="technical-content" id="technical-${index}">
+                        <pre>${JSON.stringify(pred, null, 2)}</pre>
+                    </div>
+                </div>
+            `;
+            
+            html += `</div>`;
+            return html;
+        }
+
+        // Switch horizon tabs
+        function switchHorizon(index) {
+            // Update tabs
+            document.querySelectorAll('.horizon-tab').forEach((tab, idx) => {
+                tab.classList.toggle('active', idx === index);
+            });
+            
+            // Update content
+            document.querySelectorAll('.horizon-content').forEach((content, idx) => {
+                content.classList.toggle('active', idx === index);
+            });
+        }
+
+        // Toggle technical details
+        function toggleTechnical(index) {
+            const content = document.getElementById(`technical-${index}`);
+            content.classList.toggle('show');
+        }
+
+        // Export prediction data
+        function exportPrediction(format) {
+            if (!window.predictionData) {
+                alert('No prediction data to export');
+                return;
+            }
+            
+            const data = window.predictionData;
+            let content, filename, type;
+            
+            if (format === 'json') {
+                content = JSON.stringify(data, null, 2);
+                filename = `prediction_${new Date().getTime()}.json`;
+                type = 'application/json';
+            } else if (format === 'csv') {
+                // Convert to CSV
+                const predictions = data.predictions || [data];
+                let csv = 'Horizon,Failure_Probability,Anomaly_Score,Confidence\n';
+                predictions.forEach(p => {
+                    csv += `${p.horizon_hours || 24},${p.failure_probability},${p.anomaly_score},${p.confidence}\n`;
+                });
+                content = csv;
+                filename = `prediction_${new Date().getTime()}.csv`;
+                type = 'text/csv';
+            }
+            
+            const blob = new Blob([content], { type });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            alert(`✅ ${format.toUpperCase()} file downloaded!`);
         }
 
         // Detect anomaly
