@@ -256,6 +256,165 @@
         .tab-content.active {
             display: block;
         }
+
+        /* Enhanced Chat UI Styles */
+        .chat-answer-container {
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 5px solid #667eea;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .chat-answer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .chat-answer-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .confidence-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .confidence-high {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .confidence-medium {
+            background: #fefcbf;
+            color: #744210;
+        }
+
+        .confidence-low {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .chat-answer-text {
+            font-size: 1.05rem;
+            line-height: 1.7;
+            color: #2d3748;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 3px solid #48bb78;
+        }
+
+        .chat-sources-container {
+            margin-top: 20px;
+        }
+
+        .chat-sources-header {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .source-item {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .source-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.15);
+        }
+
+        .source-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .source-title {
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 0.95rem;
+        }
+
+        .relevance-score {
+            padding: 4px 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .source-content {
+            color: #4a5568;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            padding-left: 10px;
+            border-left: 2px solid #e2e8f0;
+            max-height: 100px;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .source-content.expanded {
+            max-height: none;
+        }
+
+        .source-expand-btn {
+            color: #667eea;
+            font-size: 0.85rem;
+            margin-top: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .source-expand-btn:hover {
+            text-decoration: underline;
+        }
+
+        .copy-answer-btn {
+            background: #48bb78;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .copy-answer-btn:hover {
+            background: #38a169;
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
@@ -644,7 +803,7 @@
             
             showLoading('chatLoading', true);
             showStatus('chatStatus', '', '');
-            showResult('chatResult', '');
+            document.getElementById('chatResult').innerHTML = '';
 
             try {
                 const response = await fetch(`${API_BASE}/chat?api_key=${API_KEY}`, {
@@ -653,15 +812,17 @@
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        question: question
+                        question: question,
+                        include_sources: true,
+                        max_results: 5
                     })
                 });
 
                 const data = await response.json();
                 
                 if (response.ok) {
-                    showStatus('chatStatus', '✅ AI response received!', 'success');
-                    showResult('chatResult', JSON.stringify(data, null, 2));
+                    showStatus('chatStatus', '✅ Answer generated successfully!', 'success');
+                    renderChatAnswer(data, question);
                 } else {
                     showStatus('chatStatus', `❌ Chat failed: ${data.detail || 'Unknown error'}`, 'error');
                 }
@@ -670,6 +831,109 @@
             } finally {
                 showLoading('chatLoading', false);
             }
+        }
+
+        // Render user-friendly chat answer
+        function renderChatAnswer(data, question) {
+            const container = document.getElementById('chatResult');
+            
+            // Determine confidence level
+            const confidence = data.confidence || 0;
+            let confidenceClass = 'confidence-low';
+            let confidenceEmoji = '⚠️';
+            if (confidence >= 0.7) {
+                confidenceClass = 'confidence-high';
+                confidenceEmoji = '✅';
+            } else if (confidence >= 0.5) {
+                confidenceClass = 'confidence-medium';
+                confidenceEmoji = '⚡';
+            }
+            
+            let html = `
+                <div class="chat-answer-container">
+                    <div class="chat-answer-header">
+                        <div class="chat-answer-title">
+                            <span>🛠️ AI Assistant Answer</span>
+                        </div>
+                        <div>
+                            <span class="confidence-badge ${confidenceClass}">
+                                ${confidenceEmoji} ${Math.round(confidence * 100)}% Confidence
+                            </span>
+                            <button class="copy-answer-btn" onclick="copyAnswer('${escapeHtml(data.answer)}')">
+                                📋 Copy Answer
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-answer-text">
+                        ${escapeHtml(data.answer)}
+                    </div>
+            `;
+            
+            // Add sources if available
+            if (data.sources && data.sources.length > 0) {
+                html += `
+                    <div class="chat-sources-container">
+                        <div class="chat-sources-header">
+                            📚 Supporting Sources (${data.sources.length})
+                        </div>
+                `;
+                
+                data.sources.forEach((source, index) => {
+                    const relevance = Math.round(source.relevance_score * 100);
+                    const contentPreview = source.content.substring(0, 150) + (source.content.length > 150 ? '...' : '');
+                    
+                    html += `
+                        <div class="source-item" onclick="toggleSource(${index})">
+                            <div class="source-header">
+                                <span class="source-title">[${index + 1}] ${escapeHtml(source.title)}</span>
+                                <span class="relevance-score">${relevance}% Match</span>
+                            </div>
+                            <div class="source-content" id="source-${index}">
+                                ${escapeHtml(contentPreview)}
+                            </div>
+                            <div class="source-expand-btn" id="expand-btn-${index}">
+                                ▼ Show full content
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `</div>`;
+            }
+            
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        // Toggle source content expansion
+        function toggleSource(index) {
+            const content = document.getElementById(`source-${index}`);
+            const btn = document.getElementById(`expand-btn-${index}`);
+            
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                btn.textContent = '▼ Show full content';
+            } else {
+                content.classList.add('expanded');
+                btn.textContent = '▲ Show less';
+            }
+        }
+
+        // Copy answer to clipboard
+        function copyAnswer(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('✅ Answer copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+            });
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
         // Set question
