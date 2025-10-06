@@ -1265,7 +1265,7 @@
             
             showLoading('anomalyLoading', true);
             showStatus('anomalyStatus', '', '');
-            showResult('anomalyResult', '');
+            document.getElementById('anomalyResult').innerHTML = '';
 
             try {
                 const response = await fetch(`${API_BASE}/predict?api_key=${API_KEY}`, {
@@ -1275,19 +1275,16 @@
                     },
                     body: JSON.stringify({
                         machine_id: machineId,
-                        anomaly_detection: true
+                        include_anomaly: true,
+                        include_factors: true
                     })
                 });
 
                 const data = await response.json();
                 
                 if (response.ok) {
-                    const score = (data.anomaly_score * 100).toFixed(2);
-                    const anomalyLevel = data.anomaly_score > 0.8 ? '🔴 HIGH ANOMALY' : 
-                                      data.anomaly_score > 0.5 ? '🟡 MEDIUM ANOMALY' : '🟢 NORMAL';
-                    
-                    showStatus('anomalyStatus', `✅ Anomaly detection completed - ${anomalyLevel}`, 'success');
-                    showResult('anomalyResult', JSON.stringify(data, null, 2));
+                    showStatus('anomalyStatus', '✅ Anomaly detection analysis complete!', 'success');
+                    renderAnomalyDashboard(data, machineId);
                 } else {
                     showStatus('anomalyStatus', `❌ Anomaly detection failed: ${data.detail || 'Unknown error'}`, 'error');
                 }
@@ -1296,6 +1293,268 @@
             } finally {
                 showLoading('anomalyLoading', false);
             }
+        }
+
+        // Render anomaly detection dashboard
+        function renderAnomalyDashboard(data, machineId) {
+            const container = document.getElementById('anomalyResult');
+            const predictions = data.predictions || [data];
+            
+            // Get anomaly score (use first prediction or data directly)
+            const pred = predictions[0] || data;
+            const anomalyScore = (pred.anomaly_score || 0) * 100;
+            const failureProb = (pred.failure_probability || 0) * 100;
+            const confidence = (pred.confidence || 0) * 100;
+            
+            // Determine overall status
+            let statusClass = 'status-normal';
+            let statusIcon = '🟢';
+            let statusText = 'NORMAL - Equipment operating within expected parameters';
+            
+            if (anomalyScore > 80) {
+                statusClass = 'status-alert';
+                statusIcon = '🔴';
+                statusText = 'HIGH ANOMALY - Immediate investigation required';
+            } else if (anomalyScore > 50) {
+                statusClass = 'status-warning';
+                statusIcon = '🟡';
+                statusText = 'MODERATE ANOMALY - Monitoring recommended';
+            }
+            
+            // Determine anomaly level
+            let anomalyClass = 'risk-low';
+            let anomalyText = 'Normal';
+            let anomalyIcon = '🟢';
+            let anomalyDescription = 'All sensors are operating within normal ranges';
+            
+            if (anomalyScore > 80) {
+                anomalyClass = 'risk-high';
+                anomalyText = 'High Anomaly';
+                anomalyIcon = '🔴';
+                anomalyDescription = 'Significant deviation detected - immediate attention required';
+            } else if (anomalyScore > 50) {
+                anomalyClass = 'risk-medium';
+                anomalyText = 'Moderate Anomaly';
+                anomalyIcon = '🟡';
+                anomalyDescription = 'Unusual patterns detected - schedule inspection';
+            } else if (anomalyScore > 20) {
+                anomalyClass = 'risk-low';
+                anomalyText = 'Low Anomaly';
+                anomalyIcon = '🟢';
+                anomalyDescription = 'Minor variations detected - continue monitoring';
+            }
+            
+            let confClass = confidence > 70 ? 'confidence-high' : confidence > 50 ? 'confidence-medium' : 'confidence-low';
+            
+            let html = `
+                <div class="prediction-dashboard">
+                    <div class="prediction-header">
+                        <div class="prediction-title">🔍 Anomaly Detection: ${machineId}</div>
+                        <div class="model-info">
+                            Model: ${data.model_version || 'Isolation Forest v1.0'} | 
+                            Analyzed: ${new Date().toLocaleString()}
+                        </div>
+                    </div>
+                    
+                    <div class="status-banner ${statusClass}">
+                        <span style="font-size: 1.5rem;">${statusIcon}</span>
+                        <span>${statusText}</span>
+                    </div>
+                    
+                    <div class="horizon-content active">
+                        <div class="metric-grid">
+                            <div class="metric-card" style="border-left-color: ${anomalyScore > 80 ? '#f56565' : anomalyScore > 50 ? '#ed8936' : '#48bb78'};">
+                                <div class="metric-label">Anomaly Score</div>
+                                <div class="metric-value">${anomalyScore.toFixed(1)}%</div>
+                                <span class="risk-badge ${anomalyClass}">${anomalyIcon} ${anomalyText}</span>
+                            </div>
+                            
+                            <div class="metric-card" style="border-left-color: ${failureProb > 70 ? '#f56565' : failureProb > 30 ? '#ed8936' : '#48bb78'};">
+                                <div class="metric-label">Failure Risk</div>
+                                <div class="metric-value">
+                                    ${failureProb < 0.01 ? '<0.01' : failureProb.toFixed(2)}%
+                                </div>
+                                <span class="risk-badge ${failureProb > 70 ? 'risk-high' : failureProb > 30 ? 'risk-medium' : 'risk-low'}">
+                                    ${failureProb > 70 ? '🔴' : failureProb > 30 ? '🟡' : '🟢'} 
+                                    ${failureProb > 70 ? 'High' : failureProb > 30 ? 'Medium' : 'Low'} Risk
+                                </span>
+                            </div>
+                            
+                            <div class="metric-card">
+                                <div class="metric-label">Detection Confidence</div>
+                                <div class="metric-value">${confidence.toFixed(0)}%</div>
+                                <div class="confidence-meter">
+                                    <div class="confidence-bar">
+                                        <div class="confidence-fill ${confClass}" style="width: ${confidence}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 4px solid ${anomalyScore > 80 ? '#f56565' : anomalyScore > 50 ? '#ed8936' : '#48bb78'};">
+                            <div style="font-weight: 600; color: #2d3748; margin-bottom: 8px;">
+                                📋 Assessment
+                            </div>
+                            <div style="color: #4a5568; line-height: 1.6;">
+                                ${anomalyDescription}
+                            </div>
+                        </div>
+            `;
+            
+            // Add anomaly score visualization
+            html += `
+                <div class="factors-container">
+                    <div class="factors-title">📊 Anomaly Score Breakdown</div>
+                    <div class="factor-bar">
+                        <div class="factor-label">
+                            <span>Overall Anomaly Level</span>
+                            <span>${anomalyScore.toFixed(1)}%</span>
+                        </div>
+                        <div class="factor-progress">
+                            <div class="factor-fill" style="width: ${anomalyScore}%; background: ${anomalyScore > 80 ? 'linear-gradient(90deg, #f56565 0%, #e53e3e 100%)' : anomalyScore > 50 ? 'linear-gradient(90deg, #ed8936 0%, #dd6b20 100%)' : 'linear-gradient(90deg, #48bb78 0%, #38a169 100%)'};">
+                                ${anomalyScore.toFixed(1)}%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Add top contributing factors if available
+            if (pred.top_factors && pred.top_factors.length > 0) {
+                html += `
+                    <div class="factors-container">
+                        <div class="factors-title">🔧 Sensors Contributing to Anomaly</div>
+                `;
+                
+                pred.top_factors.slice(0, 5).forEach(factor => {
+                    const featureName = factor.feature.replace(/_/g, ' ').replace(/roll/g, 'avg').replace(/lag/g, 'prev');
+                    const importance = factor.importance * 100;
+                    
+                    html += `
+                        <div class="factor-bar">
+                            <div class="factor-label">
+                                <span>${featureName}</span>
+                                <span>${importance.toFixed(1)}%</span>
+                            </div>
+                            <div class="factor-progress">
+                                <div class="factor-fill" style="width: ${importance}%">
+                                    ${importance.toFixed(0)}%
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `</div>`;
+            }
+            
+            // Add recommendations
+            html += `
+                <div class="factors-container">
+                    <div class="factors-title">💡 Recommendations</div>
+                    <div style="background: white; padding: 15px; border-radius: 8px;">
+            `;
+            
+            if (anomalyScore > 80) {
+                html += `
+                    <div style="margin-bottom: 10px; padding: 10px; background: #fed7d7; border-left: 3px solid #f56565; border-radius: 5px;">
+                        <strong>🔴 Immediate Action Required:</strong><br>
+                        • Stop machine and conduct thorough inspection<br>
+                        • Check sensors listed above for malfunctions<br>
+                        • Contact maintenance team immediately
+                    </div>
+                `;
+            } else if (anomalyScore > 50) {
+                html += `
+                    <div style="margin-bottom: 10px; padding: 10px; background: #fefcbf; border-left: 3px solid #ed8936; border-radius: 5px;">
+                        <strong>🟡 Monitoring Required:</strong><br>
+                        • Schedule inspection within 24 hours<br>
+                        • Increase monitoring frequency<br>
+                        • Review sensor data for patterns
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div style="margin-bottom: 10px; padding: 10px; background: #c6f6d5; border-left: 3px solid #48bb78; border-radius: 5px;">
+                        <strong>🟢 Preventive Measures:</strong><br>
+                        • Continue regular monitoring schedule<br>
+                        • Maintain routine maintenance procedures<br>
+                        • Document any minor variations for trend analysis
+                    </div>
+                `;
+            }
+            
+            html += `
+                    </div>
+                </div>
+            `;
+            
+            // Add technical details
+            html += `
+                <div class="technical-details">
+                    <div class="technical-toggle" onclick="toggleTechnical(0)">
+                        ▼ Technical Details & Raw Data
+                    </div>
+                    <div class="technical-content" id="technical-0">
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                </div>
+            `;
+            
+            // Add export buttons
+            html += `
+                <div class="export-buttons">
+                    <button class="export-btn" onclick="exportAnomaly('json')">
+                        📄 Download JSON Report
+                    </button>
+                    <button class="export-btn" onclick="exportAnomaly('csv')">
+                        📊 Download CSV Report
+                    </button>
+                </div>
+            `;
+            
+            html += `</div></div>`;
+            container.innerHTML = html;
+            
+            // Store data for export
+            window.anomalyData = data;
+        }
+
+        // Export anomaly data
+        function exportAnomaly(format) {
+            if (!window.anomalyData) {
+                alert('No anomaly data to export');
+                return;
+            }
+            
+            const data = window.anomalyData;
+            const pred = (data.predictions && data.predictions[0]) || data;
+            let content, filename, type;
+            
+            if (format === 'json') {
+                content = JSON.stringify(data, null, 2);
+                filename = `anomaly_detection_${new Date().getTime()}.json`;
+                type = 'application/json';
+            } else if (format === 'csv') {
+                // Convert to CSV
+                let csv = 'Timestamp,Machine_ID,Anomaly_Score,Failure_Probability,Confidence,Status\n';
+                const anomalyScore = (pred.anomaly_score || 0) * 100;
+                const status = anomalyScore > 80 ? 'High Anomaly' : anomalyScore > 50 ? 'Moderate Anomaly' : 'Normal';
+                csv += `${new Date().toISOString()},${pred.machine_id || 'Unknown'},${pred.anomaly_score},${pred.failure_probability},${pred.confidence},${status}\n`;
+                content = csv;
+                filename = `anomaly_detection_${new Date().getTime()}.csv`;
+                type = 'text/csv';
+            }
+            
+            const blob = new Blob([content], { type });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            alert(`✅ ${format.toUpperCase()} report downloaded!`);
         }
 
         // Ask question
