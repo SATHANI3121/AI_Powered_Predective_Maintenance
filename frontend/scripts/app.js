@@ -306,7 +306,12 @@ function escapeHtml(text) {
 // ============================================
 async function checkHealth() {
   try {
-    const response = await fetch('/healthz', { 
+    // Health check endpoint is on the API server, not the frontend server
+    const healthUrl = window.APP_CONFIG.API_BASE 
+      ? window.APP_CONFIG.API_BASE.replace('/api/v1', '/healthz')
+      : '/healthz';
+    
+    const response = await fetch(healthUrl, { 
       method: 'GET',
       cache: 'no-cache'
     });
