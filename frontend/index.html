@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Predictive Maintenance Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .card h3 {
+            color: #4a5568;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .status.success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+
+        .status.error {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 1px solid #feb2b2;
+        }
+
+        .status.info {
+            background: #bee3f8;
+            color: #2a4365;
+            border: 1px solid #90cdf4;
+        }
+
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .result pre {
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        .file-upload {
+            border: 2px dashed #cbd5e0;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            transition: border-color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .file-upload:hover {
+            border-color: #667eea;
+        }
+
+        .file-upload.dragover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .health-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .health-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #48bb78;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            background: #f7fafc;
+            border: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AI-Powered Predictive Maintenance</h1>
+            <p>Intelligent Machine Learning Platform for Predictive Analytics</p>
+        </div>
+
+        <div class="health-status">
+            <div class="health-indicator" id="healthIndicator"></div>
+            <span id="healthStatus">Checking API status...</span>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('upload')">📊 Data Upload</button>
+            <button class="tab" onclick="showTab('predict')">🔮 Predictions</button>
+            <button class="tab" onclick="showTab('chat')">💬 AI Chat</button>
+            <button class="tab" onclick="showTab('alerts')">🚨 Alerts</button>
+        </div>
+
+        <!-- Data Upload Tab -->
+        <div id="upload" class="tab-content active">
+            <div class="dashboard">
+                <div class="card">
+                    <h3>📁 Upload Sensor Data</h3>
+                    <div class="file-upload" id="fileUpload">
+                        <p>📎 Drag & drop CSV file here or click to browse</p>
+                        <input type="file" id="csvFile" accept=".csv" style="display: none;">
+                    </div>
+                    <div class="form-group">
+                        <label for="machineId">Machine ID (will be added to CSV):</label>
+                        <input type="text" id="machineId" placeholder="e.g., MACHINE_001" value="MACHINE_001">
+                    </div>
+                    <button class="btn" onclick="uploadData()">Upload & Process Data</button>
+                    <div class="loading" id="uploadLoading">
+                        <div class="spinner"></div>
+                        Processing sensor data...
+                    </div>
+                    <div id="uploadStatus"></div>
+                    <div id="uploadResult"></div>
+                </div>
+
+                <div class="card">
+                    <h3>📈 Sample Data Generator</h3>
+                    <p>Generate sample sensor data for testing</p>
+                    <div class="form-group">
+                        <label for="sampleRows">Number of rows:</label>
+                        <input type="number" id="sampleRows" value="100" min="10" max="1000">
+                    </div>
+                    <button class="btn" onclick="generateSampleData()">Generate Sample Data</button>
+                    <div id="sampleStatus"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Predictions Tab -->
+        <div id="predict" class="tab-content">
+            <div class="dashboard">
+                <div class="card">
+                    <h3>🔮 Failure Prediction</h3>
+                    <div class="form-group">
+                        <label for="predictMachineId">Machine ID:</label>
+                        <input type="text" id="predictMachineId" placeholder="e.g., MACHINE_001" value="MACHINE_001">
+                    </div>
+                    <div class="form-group">
+                        <label for="horizonHours">Prediction Horizon (hours):</label>
+                        <select id="horizonHours">
+                            <option value="24">24 hours</option>
+                            <option value="48">48 hours</option>
+                            <option value="72">72 hours</option>
+                        </select>
+                    </div>
+                    <button class="btn" onclick="getPrediction()">Get Failure Prediction</button>
+                    <div class="loading" id="predictLoading">
+                        <div class="spinner"></div>
+                        Analyzing machine data...
+                    </div>
+                    <div id="predictStatus"></div>
+                    <div id="predictResult"></div>
+                </div>
+
+                <div class="card">
+                    <h3>🔍 Anomaly Detection</h3>
+                    <div class="form-group">
+                        <label for="anomalyMachineId">Machine ID:</label>
+                        <input type="text" id="anomalyMachineId" placeholder="e.g., MACHINE_001" value="MACHINE_001">
+                    </div>
+                    <button class="btn" onclick="detectAnomaly()">Detect Anomalies</button>
+                    <div class="loading" id="anomalyLoading">
+                        <div class="spinner"></div>
+                        Detecting anomalies...
+                    </div>
+                    <div id="anomalyStatus"></div>
+                    <div id="anomalyResult"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Tab -->
+        <div id="chat" class="tab-content">
+            <div class="dashboard">
+                <div class="card">
+                    <h3>💬 AI Maintenance Assistant</h3>
+                    <div class="form-group">
+                        <label for="chatQuestion">Ask a question about maintenance:</label>
+                        <textarea id="chatQuestion" rows="4" placeholder="e.g., What are the common causes of bearing failure? How should I maintain my hydraulic system?"></textarea>
+                    </div>
+                    <button class="btn" onclick="askQuestion()">Ask AI Assistant</button>
+                    <div class="loading" id="chatLoading">
+                        <div class="spinner"></div>
+                        AI is thinking...
+                    </div>
+                    <div id="chatStatus"></div>
+                    <div id="chatResult"></div>
+                </div>
+
+                <div class="card">
+                    <h3>💡 Quick Questions</h3>
+                    <p>Try these sample questions:</p>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <button class="btn" onclick="setQuestion('What are the signs of bearing failure?')" style="background: #48bb78;">Bearing Failure Signs</button>
+                        <button class="btn" onclick="setQuestion('How often should I lubricate my equipment?')" style="background: #4299e1;">Lubrication Schedule</button>
+                        <button class="btn" onclick="setQuestion('What causes vibration in rotating machinery?')" style="background: #ed8936;">Vibration Analysis</button>
+                        <button class="btn" onclick="setQuestion('How to troubleshoot hydraulic system issues?')" style="background: #9f7aea;">Hydraulic Systems</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alerts Tab -->
+        <div id="alerts" class="tab-content">
+            <div class="dashboard">
+                <div class="card">
+                    <h3>🚨 Active Alerts</h3>
+                    <button class="btn" onclick="getAlerts()">Refresh Alerts</button>
+                    <div class="loading" id="alertsLoading">
+                        <div class="spinner"></div>
+                        Loading alerts...
+                    </div>
+                    <div id="alertsStatus"></div>
+                    <div id="alertsResult"></div>
+                </div>
+
+                <div class="card">
+                    <h3>📊 System Health</h3>
+                    <button class="btn" onclick="getHealth()">Check System Health</button>
+                    <div id="healthResult"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/api/v1';
+        const API_KEY = 'dev-CHANGE-ME';
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            checkHealth();
+            setupFileUpload();
+        });
+
+        // Tab switching
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        // Health check
+        async function checkHealth() {
+            try {
+                const response = await fetch('http://localhost:8000/healthz');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('healthStatus').textContent = '✅ API is healthy';
+                    document.getElementById('healthIndicator').style.background = '#48bb78';
+                } else {
+                    throw new Error('API not responding');
+                }
+            } catch (error) {
+                document.getElementById('healthStatus').textContent = '❌ API connection failed';
+                document.getElementById('healthIndicator').style.background = '#e53e3e';
+            }
+        }
+
+        // File upload setup
+        function setupFileUpload() {
+            const fileUpload = document.getElementById('fileUpload');
+            const fileInput = document.getElementById('csvFile');
+
+            fileUpload.addEventListener('click', () => fileInput.click());
+            fileUpload.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                fileUpload.classList.add('dragover');
+            });
+            fileUpload.addEventListener('dragleave', () => {
+                fileUpload.classList.remove('dragover');
+            });
+            fileUpload.addEventListener('drop', (e) => {
+                e.preventDefault();
+                fileUpload.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    fileInput.files = files;
+                }
+            });
+        }
+
+        // Upload data
+        async function uploadData() {
+            const fileInput = document.getElementById('csvFile');
+            const machineId = document.getElementById('machineId').value;
+            
+            if (!fileInput.files[0]) {
+                showStatus('uploadStatus', 'Please select a CSV file', 'error');
+                return;
+            }
+
+            showLoading('uploadLoading', true);
+            showStatus('uploadStatus', '', '');
+            showResult('uploadResult', '');
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            try {
+                const response = await fetch(`${API_BASE}/ingest?api_key=${API_KEY}`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    showStatus('uploadStatus', '✅ Data uploaded successfully!', 'success');
+                    showResult('uploadResult', JSON.stringify(data, null, 2));
+                } else {
+                    let errorMessage = 'Unknown error';
+                    try {
+                        const errorData = await response.json();
+                        errorMessage = errorData.detail || errorData.message || JSON.stringify(errorData);
+                    } catch (e) {
+                        errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+                    }
+                    showStatus('uploadStatus', `❌ Upload failed: ${errorMessage}`, 'error');
+                }
+            } catch (error) {
+                showStatus('uploadStatus', `❌ Upload failed: ${error.message}`, 'error');
+            } finally {
+                showLoading('uploadLoading', false);
+            }
+        }
+
+        // Generate sample data
+        async function generateSampleData() {
+            const rows = document.getElementById('sampleRows').value;
+            const machineId = document.getElementById('machineId').value || 'MACHINE_001';
+            showStatus('sampleStatus', 'Generating sample data...', 'info');
+            
+            // Generate sample CSV data
+            let csvContent = 'timestamp,machine_id,sensor,value\n';
+            const now = new Date();
+            
+            for (let i = 0; i < rows; i++) {
+                const timestamp = new Date(now.getTime() - (rows - i) * 60000).toISOString();
+                const sensors = ['temperature', 'vibration', 'pressure', 'speed'];
+                const sensor = sensors[Math.floor(Math.random() * sensors.length)];
+                const value = (Math.random() * 100).toFixed(2);
+                
+                csvContent += `${timestamp},${machineId},${sensor},${value}\n`;
+            }
+            
+            // Create and download file
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'sample_sensor_data.csv';
+            a.click();
+            window.URL.revokeObjectURL(url);
+            
+            showStatus('sampleStatus', '✅ Sample data generated and downloaded!', 'success');
+        }
+
+        // Get prediction
+        async function getPrediction() {
+            const machineId = document.getElementById('predictMachineId').value;
+            const horizonHours = document.getElementById('horizonHours').value;
+            
+            showLoading('predictLoading', true);
+            showStatus('predictStatus', '', '');
+            showResult('predictResult', '');
+
+            try {
+                const response = await fetch(`${API_BASE}/predict?api_key=${API_KEY}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        machine_id: machineId,
+                        horizon_hours: parseInt(horizonHours)
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    const probability = (data.failure_probability * 100).toFixed(2);
+                    const riskLevel = data.failure_probability > 0.7 ? '🔴 HIGH' : 
+                                    data.failure_probability > 0.4 ? '🟡 MEDIUM' : '🟢 LOW';
+                    
+                    showStatus('predictStatus', `✅ Prediction completed - Risk Level: ${riskLevel}`, 'success');
+                    showResult('predictResult', JSON.stringify(data, null, 2));
+                } else {
+                    showStatus('predictStatus', `❌ Prediction failed: ${data.detail || 'Unknown error'}`, 'error');
+                }
+            } catch (error) {
+                showStatus('predictStatus', `❌ Prediction failed: ${error.message}`, 'error');
+            } finally {
+                showLoading('predictLoading', false);
+            }
+        }
+
+        // Detect anomaly
+        async function detectAnomaly() {
+            const machineId = document.getElementById('anomalyMachineId').value;
+            
+            showLoading('anomalyLoading', true);
+            showStatus('anomalyStatus', '', '');
+            showResult('anomalyResult', '');
+
+            try {
+                const response = await fetch(`${API_BASE}/predict?api_key=${API_KEY}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        machine_id: machineId,
+                        anomaly_detection: true
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    const score = (data.anomaly_score * 100).toFixed(2);
+                    const anomalyLevel = data.anomaly_score > 0.8 ? '🔴 HIGH ANOMALY' : 
+                                      data.anomaly_score > 0.5 ? '🟡 MEDIUM ANOMALY' : '🟢 NORMAL';
+                    
+                    showStatus('anomalyStatus', `✅ Anomaly detection completed - ${anomalyLevel}`, 'success');
+                    showResult('anomalyResult', JSON.stringify(data, null, 2));
+                } else {
+                    showStatus('anomalyStatus', `❌ Anomaly detection failed: ${data.detail || 'Unknown error'}`, 'error');
+                }
+            } catch (error) {
+                showStatus('anomalyStatus', `❌ Anomaly detection failed: ${error.message}`, 'error');
+            } finally {
+                showLoading('anomalyLoading', false);
+            }
+        }
+
+        // Ask question
+        async function askQuestion() {
+            const question = document.getElementById('chatQuestion').value.trim();
+            
+            if (!question) {
+                showStatus('chatStatus', 'Please enter a question', 'error');
+                return;
+            }
+            
+            showLoading('chatLoading', true);
+            showStatus('chatStatus', '', '');
+            showResult('chatResult', '');
+
+            try {
+                const response = await fetch(`${API_BASE}/chat?api_key=${API_KEY}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        question: question
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showStatus('chatStatus', '✅ AI response received!', 'success');
+                    showResult('chatResult', JSON.stringify(data, null, 2));
+                } else {
+                    showStatus('chatStatus', `❌ Chat failed: ${data.detail || 'Unknown error'}`, 'error');
+                }
+            } catch (error) {
+                showStatus('chatStatus', `❌ Chat failed: ${error.message}`, 'error');
+            } finally {
+                showLoading('chatLoading', false);
+            }
+        }
+
+        // Set question
+        function setQuestion(question) {
+            document.getElementById('chatQuestion').value = question;
+        }
+
+        // Get alerts
+        async function getAlerts() {
+            showLoading('alertsLoading', true);
+            showStatus('alertsStatus', '', '');
+            showResult('alertsResult', '');
+
+            try {
+                const response = await fetch(`${API_BASE}/alerts?api_key=${API_KEY}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showStatus('alertsStatus', `✅ Found ${data.length} alerts`, 'success');
+                    showResult('alertsResult', JSON.stringify(data, null, 2));
+                } else {
+                    showStatus('alertsStatus', `❌ Failed to get alerts: ${data.detail || 'Unknown error'}`, 'error');
+                }
+            } catch (error) {
+                showStatus('alertsStatus', `❌ Failed to get alerts: ${error.message}`, 'error');
+            } finally {
+                showLoading('alertsLoading', false);
+            }
+        }
+
+        // Get health
+        async function getHealth() {
+            try {
+                const response = await fetch('http://localhost:8000/healthz');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('healthResult', JSON.stringify(data, null, 2));
+                } else {
+                    showResult('healthResult', `Health check failed: ${data.detail || 'Unknown error'}`);
+                }
+            } catch (error) {
+                showResult('healthResult', `Health check failed: ${error.message}`);
+            }
+        }
+
+        // Utility functions
+        function showLoading(elementId, show) {
+            document.getElementById(elementId).style.display = show ? 'block' : 'none';
+        }
+
+        function showStatus(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `status ${type}`;
+        }
+
+        function showResult(elementId, content) {
+            const element = document.getElementById(elementId);
+            if (content) {
+                element.innerHTML = `<pre>${content}</pre>`;
+            } else {
+                element.innerHTML = '';
+            }
+        }
+    </script>
+</body>
+</html>

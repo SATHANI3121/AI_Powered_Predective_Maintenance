@@ -12,7 +12,8 @@ from api.schemas import (
     ChatRequest, ChatResponse, ChatSource
 )
 from api.deps import get_database, verify_api_key, get_rag_service
-from api.telemetry import structured_logger, RAG_QUERY_COUNT, RAG_QUERY_DURATION
+from api.telemetry import structured_logger
+# Metrics temporarily disabled: RAG_QUERY_COUNT, RAG_QUERY_DURATION
 from rag.retrieve import RAGService
 
 logger = logging.getLogger(__name__)
@@ -54,9 +55,8 @@ async def chat_with_rag(
         # Calculate processing time
         processing_time = time.time() - start_time
         
-        # Record metrics
-        RAG_QUERY_COUNT.labels(query_type="maintenance").inc()
-        RAG_QUERY_DURATION.observe(processing_time)
+        # Record metrics (temporarily disabled)
+        # TODO: Re-enable metrics once server is stable
         
         # Log structured data
         structured_logger.info(

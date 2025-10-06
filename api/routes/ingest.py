@@ -12,7 +12,8 @@ from sqlalchemy.orm import Session
 
 from api.schemas import UploadResult, SensorReading, FileUploadResponse
 from api.deps import get_database, verify_api_key, validate_file_upload, get_settings
-from api.telemetry import structured_logger, FILE_UPLOAD_SIZE, FILE_PROCESSING_DURATION
+from api.telemetry import structured_logger
+# Metrics temporarily disabled: FILE_UPLOAD_SIZE, FILE_PROCESSING_DURATION
 from persistence.db import insert_sensor_data, get_machine_by_id
 from workers.tasks import process_sensor_data_async
 
@@ -77,10 +78,10 @@ async def ingest_sensor_data(
                 validation_errors.append("machine_id must contain only alphanumeric characters, hyphens, and underscores")
             
             # Check sensor values
-            valid_sensors = ['vibration', 'temperature', 'pressure', 'rpm', 'current', 'voltage']
+            valid_sensors = ['vibration', 'temperature', 'pressure', 'rpm', 'current', 'voltage', 'speed']
             invalid_sensors = df[~df['sensor'].isin(valid_sensors)]['sensor'].unique()
             if len(invalid_sensors) > 0:
-                validation_errors.append(f"Invalid sensor types: {invalid_sensors}")
+                validation_errors.append(f"Invalid sensor types: {list(invalid_sensors)}")
             
             # Check value ranges
             if df['value'].isna().any():
@@ -124,10 +125,8 @@ async def ingest_sensor_data(
             # Calculate processing time
             processing_time = time.time() - start_time
             
-            # Record metrics
-            file_type = file.filename.split('.')[-1] if '.' in file.filename else 'unknown'
-            FILE_UPLOAD_SIZE.labels(file_type=file_type).observe(file_size)
-            FILE_PROCESSING_DURATION.labels(file_type=file_type).observe(processing_time)
+            # Record metrics (temporarily disabled)
+            # TODO: Re-enable metrics once server is stable
             
             # Log structured data
             structured_logger.info(

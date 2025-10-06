@@ -1,0 +1,21 @@
+Equipment Maintenance Guide
+
+1. Regular Inspections
+   - Check temperature sensors daily
+   - Monitor vibration levels weekly
+   - Inspect electrical connections monthly
+
+2. Failure Prevention
+   - Replace filters every 3 months
+   - Lubricate moving parts monthly
+   - Calibrate sensors quarterly
+
+3. Emergency Procedures
+   - Shut down equipment if temperature exceeds 80°C
+   - Contact maintenance team for vibration > 0.5
+   - Isolate electrical faults immediately
+
+4. Troubleshooting
+   - High temperature: Check cooling system
+   - Excessive vibration: Inspect bearings
+   - Electrical issues: Verify connections and power supply

@@ -178,7 +178,7 @@ class AnalyticsRequest(BaseModel):
     start_date: datetime
     end_date: datetime
     metrics: List[str] = Field(default=["failure_probability", "anomaly_score"])
-    aggregation: str = Field("hour", regex="^(minute|hour|day|week)$")
+    aggregation: str = Field("hour", pattern="^(minute|hour|day|week)$")
     
     @validator('end_date')
     def validate_date_range(cls, v, values):

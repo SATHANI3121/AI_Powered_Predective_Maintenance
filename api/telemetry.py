@@ -18,18 +18,7 @@ from opentelemetry.instrumentation.requests import RequestsInstrumentor
 
 logger = logging.getLogger(__name__)
 
-# Prometheus metrics
-REQUEST_COUNT = Counter(
-    'pdm_requests_total',
-    'Total number of API requests',
-    ['method', 'endpoint', 'status_code']
-)
-
-REQUEST_DURATION = Histogram(
-    'pdm_request_duration_seconds',
-    'Request duration in seconds',
-    ['method', 'endpoint']
-)
+# Prometheus metrics (moved to api/metrics.py to avoid conflicts)
 
 PREDICTION_COUNT = Counter(
     'pdm_predictions_total',

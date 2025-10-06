@@ -17,7 +17,18 @@ from .models import Base, Machine, SensorReading, Prediction, Alert
 
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+psycopg2://user:pass@localhost:5432/pdm")
 
-engine = create_engine(DATABASE_URL, pool_pre_ping=True)
+# Fall back to SQLite if PostgreSQL is not available
+try:
+    engine = create_engine(DATABASE_URL, pool_pre_ping=True)
+    # Test connection
+    with engine.connect() as conn:
+        conn.execute(text("SELECT 1"))
+    print("✅ Connected to PostgreSQL")
+except Exception as e:
+    print(f"⚠️  PostgreSQL not available: {e}")
+    print("📦 Using SQLite database instead...")
+    DATABASE_URL = "sqlite:///./pdm.db"
+    engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 

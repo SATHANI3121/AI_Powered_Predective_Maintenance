@@ -7,12 +7,12 @@ import logging
 from typing import Generator, Optional
 from contextlib import asynccontextmanager
 
-from fastapi import Depends, HTTPException, status, Header, Request
+from fastapi import Depends, HTTPException, status, Header, Request, Query
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 import redis
@@ -38,21 +38,33 @@ class Settings(BaseSettings):
     app_name: str = "Predictive Maintenance API"
     debug: bool = False
     environment: str = "local"
+    app_env: Optional[str] = None
+    log_level: Optional[str] = None
     
     # Security
     api_key: str = "dev-CHANGE-ME"
     jwt_secret_key: str = "your-secret-key"
     jwt_algorithm: str = "HS256"
     jwt_expire_minutes: int = 30
+    jwt_audience: Optional[str] = None
+    jwt_issuer: Optional[str] = None
     
     # Azure
     azure_tenant_id: Optional[str] = None
     azure_client_id: Optional[str] = None
     azure_client_secret: Optional[str] = None
     azure_key_vault_url: Optional[str] = None
+    azure_storage_account_name: Optional[str] = None
+    azure_key_vault_name: Optional[str] = None
+    azure_search_service_name: Optional[str] = None
+    azure_container_registry: Optional[str] = None
     
     # Database
     database_url: str = "postgresql+psycopg2://user:pass@localhost:5432/pdm"
+    postgres_host: Optional[str] = None
+    postgres_db: Optional[str] = None
+    postgres_user: Optional[str] = None
+    postgres_password: Optional[str] = None
     
     # Redis
     redis_url: str = "redis://localhost:6379/0"
@@ -74,6 +86,41 @@ class Settings(BaseSettings):
     max_file_size_mb: int = 100
     allowed_file_types: str = "csv,txt"
     upload_temp_dir: str = "./temp_uploads"
+    
+    # Monitoring
+    appinsights_name: Optional[str] = None
+    log_analytics_workspace: Optional[str] = None
+    prometheus_port: Optional[str] = None
+    otel_exporter_otlp_endpoint: Optional[str] = None
+    otel_service_name: Optional[str] = None
+    
+    # Azure additional fields
+    azure_subscription_id: Optional[str] = None
+    azure_resource_group: Optional[str] = None
+    azure_location: Optional[str] = None
+    azure_key_vault_tenant_id: Optional[str] = None
+    azure_key_vault_client_id: Optional[str] = None
+    azure_key_vault_client_secret: Optional[str] = None
+    azure_container_registry_username: Optional[str] = None
+    azure_container_registry_password: Optional[str] = None
+    
+    # ML additional fields
+    model_retrain_schedule: Optional[str] = None
+    lag_windows: Optional[str] = None
+    rolling_windows: Optional[str] = None
+    prediction_horizon_hours: Optional[str] = None
+    
+    # OpenAI
+    openai_api_key: Optional[str] = None
+    openai_api_base: Optional[str] = None
+    openai_api_version: Optional[str] = None
+    
+    # Thresholds
+    failure_prob_threshold: Optional[str] = None
+    anomaly_score_threshold: Optional[str] = None
+    high_severity_threshold: Optional[str] = None
+    medium_severity_threshold: Optional[str] = None
+    low_severity_threshold: Optional[str] = None
     
     class Config:
         env_file = ".env"
@@ -123,15 +170,28 @@ def get_queue() -> Queue:
 
 
 # Authentication dependencies
-def verify_api_key(x_api_key: str = Header(..., alias="X-API-Key")) -> str:
-    """Verify API key"""
+def verify_api_key(
+    x_api_key: Optional[str] = Header(None, alias="X-API-Key"),
+    api_key: Optional[str] = Query(None)
+) -> str:
+    """Verify API key from header or query parameter"""
     settings = get_settings()
-    if x_api_key != settings.api_key:
+    
+    # Try to get API key from header first, then query parameter
+    provided_key = x_api_key or api_key
+    
+    if not provided_key:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="API key required"
+        )
+    
+    if provided_key != settings.api_key:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid API key"
         )
-    return x_api_key
+    return provided_key
 
 
 def verify_jwt_token(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
@@ -187,10 +247,16 @@ def validate_file_upload(
             detail=f"File too large. Maximum size: {settings.max_file_size_mb}MB"
         )
     
-    if not any(content_type.startswith(t) for t in allowed_types):
+    # Check if content type is allowed (more flexible checking)
+    allowed_content_types = [
+        "text/csv", "application/csv", "text/plain",
+        "text/csv; charset=utf-8", "application/octet-stream"
+    ]
+    
+    if not any(content_type.startswith(t) for t in allowed_types) and content_type not in allowed_content_types:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid file type. Allowed: {allowed_types}"
+            detail=f"Invalid file type. Allowed: {allowed_types} or {allowed_content_types}"
         )
     
     return True

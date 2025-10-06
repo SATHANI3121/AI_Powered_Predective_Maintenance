@@ -11,7 +11,8 @@ from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
-from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
+from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
+from api.metrics import get_metrics
 from starlette.responses import Response
 
 from api.routes import ingest, predict, alerts, chat
@@ -20,16 +21,7 @@ from api.telemetry import setup_telemetry
 from persistence.db import init_db
 
 # Prometheus metrics
-REQUEST_COUNT = Counter(
-    'pdm_requests_total', 
-    'Total API requests', 
-    ['method', 'endpoint', 'status']
-)
-REQUEST_DURATION = Histogram(
-    'pdm_request_duration_seconds',
-    'Request duration in seconds',
-    ['method', 'endpoint']
-)
+from api.metrics import get_metrics
 
 # Configure logging
 logging.basicConfig(
@@ -92,17 +84,9 @@ def create_app() -> FastAPI:
         # Calculate duration
         duration = time.time() - start_time
         
-        # Update metrics
-        REQUEST_COUNT.labels(
-            method=request.method,
-            endpoint=request.url.path,
-            status=response.status_code
-        ).inc()
-        
-        REQUEST_DURATION.labels(
-            method=request.method,
-            endpoint=request.url.path
-        ).observe(duration)
+        # Update metrics (temporarily disabled to fix startup)
+        # TODO: Re-enable metrics once the server is stable
+        pass
         
         # Log request
         logger.info(
