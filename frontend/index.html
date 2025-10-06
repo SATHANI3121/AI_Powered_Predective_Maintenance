@@ -335,68 +335,55 @@
             gap: 8px;
         }
 
-        .source-item {
+        /* Compact Citation Styles */
+        .source-citations {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 10px;
             background: white;
             border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 10px;
-            border: 1px solid #e2e8f0;
-            transition: all 0.3s ease;
-            cursor: pointer;
         }
 
-        .source-item:hover {
-            border-color: #667eea;
-            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.15);
-        }
-
-        .source-header {
+        .source-citation {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
+            gap: 12px;
+            padding: 10px 15px;
+            background: #f7fafc;
+            border-radius: 6px;
+            border-left: 3px solid #667eea;
+            transition: all 0.2s ease;
         }
 
-        .source-title {
-            font-weight: 600;
+        .source-citation:hover {
+            background: #edf2f7;
+            transform: translateX(5px);
+        }
+
+        .citation-number {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1rem;
+            min-width: 30px;
+        }
+
+        .citation-title {
+            flex: 1;
             color: #2d3748;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
+            font-weight: 500;
         }
 
-        .relevance-score {
+        .citation-relevance {
             padding: 4px 10px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border-radius: 12px;
             font-size: 0.8rem;
             font-weight: 600;
-        }
-
-        .source-content {
-            color: #4a5568;
-            font-size: 0.9rem;
-            line-height: 1.6;
-            padding-left: 10px;
-            border-left: 2px solid #e2e8f0;
-            max-height: 100px;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-        }
-
-        .source-content.expanded {
-            max-height: none;
-        }
-
-        .source-expand-btn {
-            color: #667eea;
-            font-size: 0.85rem;
-            margin-top: 8px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .source-expand-btn:hover {
-            text-decoration: underline;
+            min-width: 50px;
+            text-align: center;
         }
 
         .copy-answer-btn {
@@ -870,54 +857,37 @@
                     </div>
             `;
             
-            // Add sources if available
+            // Add sources if available (show top 3 as compact citations)
             if (data.sources && data.sources.length > 0) {
+                const topSources = data.sources.slice(0, 3); // Only top 3
                 html += `
                     <div class="chat-sources-container">
                         <div class="chat-sources-header">
-                            📚 Supporting Sources (${data.sources.length})
+                            📚 Sources Referenced
                         </div>
+                        <div class="source-citations">
                 `;
                 
-                data.sources.forEach((source, index) => {
+                topSources.forEach((source, index) => {
                     const relevance = Math.round(source.relevance_score * 100);
-                    const contentPreview = source.content.substring(0, 150) + (source.content.length > 150 ? '...' : '');
                     
                     html += `
-                        <div class="source-item" onclick="toggleSource(${index})">
-                            <div class="source-header">
-                                <span class="source-title">[${index + 1}] ${escapeHtml(source.title)}</span>
-                                <span class="relevance-score">${relevance}% Match</span>
-                            </div>
-                            <div class="source-content" id="source-${index}">
-                                ${escapeHtml(contentPreview)}
-                            </div>
-                            <div class="source-expand-btn" id="expand-btn-${index}">
-                                ▼ Show full content
-                            </div>
+                        <div class="source-citation">
+                            <span class="citation-number">[${index + 1}]</span>
+                            <span class="citation-title">${escapeHtml(source.title)}</span>
+                            <span class="citation-relevance">${relevance}%</span>
                         </div>
                     `;
                 });
                 
-                html += `</div>`;
+                html += `
+                        </div>
+                    </div>
+                `;
             }
             
             html += `</div>`;
             container.innerHTML = html;
-        }
-
-        // Toggle source content expansion
-        function toggleSource(index) {
-            const content = document.getElementById(`source-${index}`);
-            const btn = document.getElementById(`expand-btn-${index}`);
-            
-            if (content.classList.contains('expanded')) {
-                content.classList.remove('expanded');
-                btn.textContent = '▼ Show full content';
-            } else {
-                content.classList.add('expanded');
-                btn.textContent = '▲ Show less';
-            }
         }
 
         // Copy answer to clipboard
