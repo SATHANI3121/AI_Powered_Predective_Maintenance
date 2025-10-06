@@ -1,0 +1,9 @@
+{
+  "API_BASE": "http://localhost:8000/api/v1",
+  "API_KEY": "dev-CHANGE-ME",
+  "USE_API_KEY": true,
+  "HEALTH_CHECK_INTERVAL": 30000,
+  "CACHE_DURATION": 30000,
+  "REQUEST_TIMEOUT": 30000
+}
+
